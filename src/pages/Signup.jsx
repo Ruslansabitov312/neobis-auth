@@ -30,8 +30,8 @@ function Signup() {
     }
 
     if (isSuccess || user) {
-      toast.success('User successfully registered!')
-      navigate('/')
+      // navigate('/signin')
+      // toast.success('User successfully registered!')
     }
 
     dispatch(reset())
