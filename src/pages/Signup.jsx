@@ -1,16 +1,41 @@
 import { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { FaUser } from 'react-icons/fa'
+import { signup, reset } from '../features/auth/authSlice'
+import Spinner from '../components/Spinner'
 
 function Signup() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     password2: '',
-    name: '',
     age: '',
+    name: '',
   })
 
-  const { email, password, password2, name, age } = formData
+  const { email, password, password2, age, name } = formData
+
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  )
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message)
+    }
+
+    if (isSuccess || user) {
+      toast.success('User successfully registered!')
+      navigate('/')
+    }
+
+    dispatch(reset())
+  }, [user, isError, isSuccess, message, navigate, dispatch])
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -21,6 +46,23 @@ function Signup() {
 
   const onSubmit = (e) => {
     e.preventDefault()
+
+    if (password !== password2) {
+      toast.error('Passwords do not match')
+    } else {
+      const userData = {
+        email,
+        password,
+        age,
+        name,
+      }
+
+      dispatch(signup(userData))
+    }
+  }
+
+  if (isLoading) {
+    return <Spinner />
   }
 
   return (
@@ -77,10 +119,10 @@ function Signup() {
             <input
               type='text'
               className='form-control'
-              id='name'
-              name='name'
-              value={name}
-              placeholder='Enter your name'
+              id='age'
+              name='age'
+              value={age}
+              placeholder='Enter your age'
               onChange={onChange}
               required
             />
@@ -90,10 +132,10 @@ function Signup() {
             <input
               type='text'
               className='form-control'
-              id='age'
-              name='age'
-              value={age}
-              placeholder='Enter your age'
+              id='name'
+              name='name'
+              value={name}
+              placeholder='Enter your name'
               onChange={onChange}
               required
             />
